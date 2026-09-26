@@ -1,0 +1,21 @@
+# Local runtimes, model weights, and download caches
+.venv/
+models/
+.cache/
+__pycache__/
+*.py[cod]
+
+# Local agent settings and credentials
+.agents/
+.codex/
+.env
+.env.*
+*.pem
+*.key
+
+# Personal prompts and generated outputs; keep only the reviewed example
+prompt.txt
+prompts/
+outputs/*
+!outputs/first-image.png
+!outputs/first-image.json

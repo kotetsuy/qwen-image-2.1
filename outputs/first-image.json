@@ -1,0 +1,19 @@
+{
+  "model": "models/Qwen-Image-2.1",
+  "prompt": "A small red fox sitting in a peaceful green forest, soft morning sunlight, detailed natural photography.",
+  "output": "outputs/first-image.png",
+  "size": 512,
+  "steps": 20,
+  "seed": 42,
+  "load_seconds": 0.5270802449995244,
+  "generation_seconds": 60.89299400900018,
+  "peak_gpu_allocated_gib": 16.446542263031006,
+  "peak_gpu_reserved_gib": 16.61328125,
+  "image_size": [
+    512,
+    512
+  ],
+  "image_mode": "RGBA",
+  "torch": "2.13.0+rocm10.0.0",
+  "hip": "7.15.26333"
+}
