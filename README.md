@@ -32,6 +32,33 @@ UTF-8で保存したテキストファイルを `--prompt-file` に指定でき�
 ファイルが読めない場合や内容が空の場合は、モデルの読み込み前にエラーを表示します。
 出力JSONにはファイル名と実際に読み込んだプロンプトを記録します。
 
+### 画像を入力して編集・合成する
+
+1枚の画像は `--image` で指定します。繰り返し指定もできます。
+
+```bash
+.venv/bin/python generate.py --image input.png \
+  --prompt 'Change the background to a sunset beach.' --output outputs/edit.png
+```
+
+複数画像は `--imagefile` の後ろにパスを並べて指定します。
+
+```bash
+.venv/bin/python generate.py --imagefile delorean.jpg race.jpg \
+  --prompt-file prompt.txt --output outputs/composite.png
+```
+
+例えば `prompt.txt` には「画像1のデロリアンが、画像2の競馬レースで馬群の先頭を走る場面にしてください。光、影、遠近感を自然に合わせてください。」と記述します。
+
+`--image delorean.jpg --image race.jpg` も同じ指定です。両オプションの併用も可能で、
+コマンドに指定した順に最大10枚を渡します。`--imagefile` は画像パスのリストを直接受け取るもので、
+ファイル一覧を書いたテキストファイルを読むオプションではありません。
+パスに空白がある場合は引用符で囲んでください。
+
+画像の向きはEXIFに合わせ、透明度は保持します。画像が読めない場合はモデル読み込み前にエラーにします。
+入力画像のパスは出力JSONの `images` に記録します。画像を指定しなければ従来のテキスト画像生成になります。
+出力サイズは `--size` で指定する正方形です。
+
 ## GPUの簡易確認
 
 ```bash

@@ -19,3 +19,4 @@ prompts/
 outputs/*
 !outputs/first-image.png
 !outputs/first-image.json
+inputs/

@@ -6,6 +6,7 @@ import time
 
 import torch
 from diffusers import QwenImage21Pipeline
+from PIL import Image, ImageOps
 
 
 def main():
@@ -14,6 +15,9 @@ def main():
     prompt_group = parser.add_mutually_exclusive_group()
     prompt_group.add_argument('--prompt', help='Prompt text')
     prompt_group.add_argument('--prompt-file', help='UTF-8 text file containing the prompt')
+    parser.add_argument('--image', dest='images', action='append', help='Input image path (repeatable)')
+    parser.add_argument('--imagefile', dest='images', action='extend', nargs='+',
+                        metavar='PATH', help='Multiple input image paths, in reference order')
     parser.add_argument('--output', default='outputs/first-image.png')
     parser.add_argument('--size', type=int, default=512)
     parser.add_argument('--steps', type=int, default=20)
@@ -28,6 +32,18 @@ def main():
             parser.error('Prompt file must not be empty or whitespace-only')
     elif args.prompt is None:
         args.prompt = 'A small red fox sitting in a peaceful green forest, soft morning sunlight, detailed natural photography.'
+    input_images = []
+    if args.images:
+        if len(args.images) > 10:
+            parser.error('At most 10 input images are supported')
+        for path in args.images:
+            try:
+                with Image.open(path) as source:
+                    oriented = ImageOps.exif_transpose(source)
+                    mode = 'RGBA' if 'A' in oriented.getbands() or 'transparency' in oriented.info else 'RGB'
+                    input_images.append(oriented.convert(mode))
+            except (OSError, ValueError, Image.DecompressionBombError) as exc:
+                parser.error(f'Cannot read input image {path!r}: {exc}')
     assert torch.cuda.is_available() and torch.version.hip, 'ROCm GPU required'
     start = time.monotonic()
     pipe = QwenImage21Pipeline.from_pretrained(
@@ -39,6 +55,7 @@ def main():
     torch.cuda.reset_peak_memory_stats()
     image = pipe(
         prompt=args.prompt, width=args.size, height=args.size,
+        **({'image': input_images} if input_images else {}),
         num_inference_steps=args.steps,
         generator=torch.Generator('cuda').manual_seed(args.seed),
     ).images[0]
