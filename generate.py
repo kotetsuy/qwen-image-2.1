@@ -53,8 +53,9 @@ def main():
     pipe.vae.enable_tiling()
     loaded = time.monotonic()
     torch.cuda.reset_peak_memory_stats()
+    width, height = input_images[0].size if input_images else (args.size, args.size)
     image = pipe(
-        prompt=args.prompt, width=args.size, height=args.size,
+        prompt=args.prompt, width=width, height=height,
         **({'image': input_images} if input_images else {}),
         num_inference_steps=args.steps,
         generator=torch.Generator('cuda').manual_seed(args.seed),
@@ -62,6 +63,8 @@ def main():
     torch.cuda.synchronize()
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
+    if input_images and image.size != (width, height):
+        image = image.resize((width, height), Image.Resampling.LANCZOS)
     image.save(output)
     report = dict(vars(args), load_seconds=loaded-start,
                   generation_seconds=time.monotonic()-loaded,
