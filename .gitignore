@@ -1,5 +1,6 @@
 # Local runtimes, model weights, and download caches
 .venv/
+.venv-rocm102/
 models/
 .cache/
 __pycache__/

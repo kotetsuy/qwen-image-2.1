@@ -76,6 +76,23 @@ UTF-8で保存したテキストファイルを `--prompt-file` に指定でき�
 .venv/bin/python check_gpu.py
 ```
 
+## ROCm 10.2 環境
+
+既存の `.venv` を残し、Python 3.14 と Radeon 8060S（gfx1151）向けに別環境を作成します。AMD のドライバーと GPU へのアクセスは別途必要です。
+
+```bash
+python3.14 -m venv .venv-rocm102
+.venv-rocm102/bin/python -m pip install --index-url https://stable.repo.amd.com/rocm/whl-next/ \
+  'torch[device-gfx1151]==2.15.0+rocm10.2.0' \
+  'torchvision[device-gfx1151]==0.29.2+rocm10.2.0'
+.venv-rocm102/bin/python -m pip install -r requirements-rocm102-app.txt
+.venv-rocm102/bin/python -m pip check
+.venv-rocm102/bin/python check_gpu.py
+.venv-rocm102/bin/python generate.py --prompt-file prompt.txt --output outputs/rocm102.png
+```
+
+パッケージの指定は [AMD の PyTorch インストール手順](https://rocm.docs.amd.com/projects/ai-ecosystem/en/latest/frameworks/pytorch/install.html?rocm-ver=10.2.0)に基づきます。`requirements-rocm102-app.txt` はアプリ側の依存を固定したもので、ROCm 10.2 の PyTorch とその依存は上記の AMD 配布元から導入します。Radeon 8060S 上で GPU の基本演算と画像生成を確認済みです。
+
 ## バージョン
 
 インストール済みのPythonパッケージは `requirements.lock.txt` に記録しています。
